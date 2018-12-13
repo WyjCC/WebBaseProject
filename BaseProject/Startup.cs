@@ -22,7 +22,7 @@ namespace BaseProject
         {
             services.AddMvc();
             //services.AddDbContext<MySqlDbContext>(options => options.UseMySQL("server=localhost;userid=root;pwd=thePassword;port=3306;database=baseIdentity;sslmode=none;"));
-            services.AddDbContext<IdentityDbContext>(options => options.UseMySql(Configuration.GetConnectionString("PostgreSql")));
+            services.AddDbContext<IdentityDbContext>(options => options.UseMySql(Configuration.GetConnectionString("BaseConnections")));
             services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<IdentityDbContext>().AddDefaultTokenProviders();
         }
 
@@ -39,6 +39,7 @@ namespace BaseProject
             {
                 app.UseExceptionHandler("/Home/Error");
             }
+
             app.UseAuthentication();
 
             app.UseStaticFiles();
