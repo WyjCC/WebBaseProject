@@ -20,10 +20,18 @@ namespace BaseProject
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
             //services.AddDbContext<MySqlDbContext>(options => options.UseMySQL("server=localhost;userid=root;pwd=thePassword;port=3306;database=baseIdentity;sslmode=none;"));
             services.AddDbContext<IdentityDbContext>(options => options.UseMySql(Configuration.GetConnectionString("BaseConnections")));
             services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<IdentityDbContext>().AddDefaultTokenProviders();
+            services.Configure<IdentityOptions>(options =>
+            {
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireDigit = false;
+            });
+            //services.AddDefaultIdentity<IdentityUser>().AddEntityFrameworkStores<IdentityDbContext>().AddDefaultTokenProviders();
+            services.AddMvc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
