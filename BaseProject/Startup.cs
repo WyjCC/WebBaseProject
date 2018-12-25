@@ -21,8 +21,8 @@ namespace BaseProject
         public void ConfigureServices(IServiceCollection services)
         {
             //services.AddDbContext<MySqlDbContext>(options => options.UseMySQL("server=localhost;userid=root;pwd=thePassword;port=3306;database=baseIdentity;sslmode=none;"));
-            services.AddDbContext<IdentityDbContext>(options => options.UseMySql(Configuration.GetConnectionString("BaseConnections")));
-            services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<IdentityDbContext>().AddDefaultTokenProviders();
+            services.AddDbContext<DbContext>(options => options.UseMySql(Configuration.GetConnectionString("BaseConnections")));
+            services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<DbContext>().AddDefaultTokenProviders();
             services.Configure<IdentityOptions>(options =>
             {
                 options.Password.RequireNonAlphanumeric = false;
@@ -35,7 +35,7 @@ namespace BaseProject
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IdentityDbContext identityDbContext)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, DbContext identityDbContext)
         {
             if (env.IsDevelopment())
             {
@@ -48,9 +48,9 @@ namespace BaseProject
                 app.UseExceptionHandler("/Home/Error");
             }
 
-            app.UseAuthentication();
-
             app.UseStaticFiles();
+
+            app.UseAuthentication();
 
             app.UseMvc(routes =>
             {
