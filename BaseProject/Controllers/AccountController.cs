@@ -13,11 +13,11 @@ namespace BaseProject.Controllers
     /// </summary>
     public class AccountController : Controller
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<IdentityUser<long>> _userManager;
+        private readonly SignInManager<IdentityUser<long>> _signInManager;
         public AccountController(
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager)
+            UserManager<IdentityUser<long>> userManager,
+            SignInManager<IdentityUser<long>> signInManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -26,15 +26,8 @@ namespace BaseProject.Controllers
         /// 注册
         /// </summary>
         /// <returns></returns>
-        public async Task<IActionResult> Register()
-        {
-            return View();
-        }
-        /// <summary>
-        /// 登陆
-        /// </summary>
-        /// <returns></returns>
-        public async Task<IActionResult> Login()
+        [HttpGet]
+        public IActionResult Register()
         {
             return View();
         }
@@ -42,12 +35,32 @@ namespace BaseProject.Controllers
         /// 提交注册
         /// </summary>
         /// <returns></returns>
-        public async Task<IActionResult> SubmitRegister(string userName, string password)
+        [HttpPost]
+        public async Task<IActionResult> Register(string userName, string password)
         {
-            IdentityUser user = new IdentityUser(userName);
+            IdentityUser<long> user = new IdentityUser<long>(userName);
             IdentityResult identityResult = await _userManager.CreateAsync(user, password);
             await _signInManager.SignInAsync(user, false);
-            return Redirect("/Home/Index");
+            return RedirectToAction("Index", "Home", new { });
+        }
+        /// <summary>
+        /// 登陆
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public IActionResult Login()
+        {
+            return View();
+        }
+        /// <summary>
+        /// 登陆
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<IActionResult> Login(string userName, string password)
+        {
+            await _signInManager.PasswordSignInAsync(userName, password, false, false);
+            return RedirectToAction("Index", "Home", new { });
         }
         /// <summary>
         /// 用户信息
@@ -57,6 +70,16 @@ namespace BaseProject.Controllers
         public async Task<IActionResult> UserInfo()
         {
             return View();
+        }
+        /// <summary>
+        /// 登出
+        /// </summary>
+        /// <returns></returns>
+        [Authorize]
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("Index", "Home", new { });
         }
     }
 }

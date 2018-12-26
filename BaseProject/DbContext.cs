@@ -8,14 +8,16 @@ using System.Threading.Tasks;
 
 namespace BaseProject
 {
-    public class DbContext : IdentityDbContext
+    public class DbContext : IdentityDbContext<IdentityUser<long>, IdentityRole<long>, long>
     {
         public DbContext(DbContextOptions options)
             : base(options)
         {
         }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
+            //base.OnModelCreating(builder);
             builder.Entity<IdentityUser<long>>(b =>
             {
                 // Primary key
@@ -39,6 +41,26 @@ namespace BaseProject
 
                 // The relationships between User and other entity types
                 // Note that these relationships are configured with no navigation properties
+            });
+
+            builder.Entity<IdentityRole<long>>(b =>
+            {
+                // Primary key
+                b.HasKey(r => r.Id);
+
+                // Index for "normalized" role name to allow efficient lookups
+                b.HasIndex(r => r.NormalizedName).HasName("RoleNameIndex").IsUnique();
+
+                // Maps to the AspNetRoles table
+                b.ToTable("AspNetRoles");
+
+                // A concurrency token for use with the optimistic concurrency checking
+                b.Property(r => r.ConcurrencyStamp).IsConcurrencyToken();
+
+                // Limit the size of columns to use efficient database types
+                b.Property(u => u.Name).HasMaxLength(256);
+                b.Property(u => u.NormalizedName).HasMaxLength(256);
+
             });
 
             builder.Entity<IdentityUserClaim<long>>(b =>
@@ -75,26 +97,6 @@ namespace BaseProject
 
                 // Maps to the AspNetUserTokens table
                 b.ToTable("AspNetUserTokens");
-            });
-
-            builder.Entity<IdentityRole<long>>(b =>
-            {
-                // Primary key
-                b.HasKey(r => r.Id);
-
-                // Index for "normalized" role name to allow efficient lookups
-                b.HasIndex(r => r.NormalizedName).HasName("RoleNameIndex").IsUnique();
-
-                // Maps to the AspNetRoles table
-                b.ToTable("AspNetRoles");
-
-                // A concurrency token for use with the optimistic concurrency checking
-                b.Property(r => r.ConcurrencyStamp).IsConcurrencyToken();
-
-                // Limit the size of columns to use efficient database types
-                b.Property(u => u.Name).HasMaxLength(256);
-                b.Property(u => u.NormalizedName).HasMaxLength(256);
-
             });
 
             builder.Entity<IdentityRoleClaim<long>>(b =>

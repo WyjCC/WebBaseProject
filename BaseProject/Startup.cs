@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace BaseProject
 {
@@ -22,7 +24,20 @@ namespace BaseProject
         {
             //services.AddDbContext<MySqlDbContext>(options => options.UseMySQL("server=localhost;userid=root;pwd=thePassword;port=3306;database=baseIdentity;sslmode=none;"));
             services.AddDbContext<DbContext>(options => options.UseMySql(Configuration.GetConnectionString("BaseConnections")));
-            services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<DbContext>().AddDefaultTokenProviders();
+            services.AddIdentity<IdentityUser<long>, IdentityRole<long>>().AddEntityFrameworkStores<DbContext>().AddDefaultTokenProviders();
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
+            {
+                options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+                options.Cookie.Name = "YourAppCookieName";
+                options.Cookie.HttpOnly = true;
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+                options.LoginPath = "/Identity/Account/Login";
+                // ReturnUrlParameter requires 
+                //using Microsoft.AspNetCore.Authentication.Cookies;
+                options.ReturnUrlParameter = CookieAuthenticationDefaults.ReturnUrlParameter;
+                options.SlidingExpiration = true;
+            });
+            //配置identity
             services.Configure<IdentityOptions>(options =>
             {
                 options.Password.RequireNonAlphanumeric = false;
@@ -30,7 +45,6 @@ namespace BaseProject
                 options.Password.RequireUppercase = false;
                 options.Password.RequireDigit = false;
             });
-            //services.AddDefaultIdentity<IdentityUser>().AddEntityFrameworkStores<IdentityDbContext>().AddDefaultTokenProviders();
             services.AddMvc();
         }
 
