@@ -39,6 +39,7 @@ namespace BaseProject
             });
             //add somethingAAA
             //fix bug
+            //fix bug 2
             //配置identity
             services.Configure<IdentityOptions>(options =>
             {
