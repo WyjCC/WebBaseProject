@@ -37,7 +37,8 @@ namespace BaseProject
                 options.ReturnUrlParameter = CookieAuthenticationDefaults.ReturnUrlParameter;
                 options.SlidingExpiration = true;
             });
-            //add something
+            //add somethingAAA
+            //fix bug
             //配置identity
             services.Configure<IdentityOptions>(options =>
             {
