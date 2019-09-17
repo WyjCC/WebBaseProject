@@ -21,8 +21,10 @@ namespace BaseProject
 
         public void ConfigureServices(IServiceCollection services)
         {
+            //使用连接字符串
             services.AddDbContext<DbContext>(options => options.UseMySql(Configuration.GetConnectionString("BaseConnections")));
             services.AddIdentity<IdentityUser<long>, IdentityRole<long>>().AddEntityFrameworkStores<DbContext>().AddDefaultTokenProviders();
+            //配置认证模式
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
             {
                 options.AccessDeniedPath = "/Identity/Account/AccessDenied";
