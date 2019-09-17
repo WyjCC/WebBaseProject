@@ -19,21 +19,17 @@ namespace BaseProject
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //services.AddDbContext<MySqlDbContext>(options => options.UseMySQL("server=localhost;userid=root;pwd=thePassword;port=3306;database=baseIdentity;sslmode=none;"));
             services.AddDbContext<DbContext>(options => options.UseMySql(Configuration.GetConnectionString("BaseConnections")));
             services.AddIdentity<IdentityUser<long>, IdentityRole<long>>().AddEntityFrameworkStores<DbContext>().AddDefaultTokenProviders();
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
             {
                 options.AccessDeniedPath = "/Identity/Account/AccessDenied";
-                options.Cookie.Name = "YourAppCookieName";
+                options.Cookie.Name = "BaseWebApp";
                 options.Cookie.HttpOnly = true;
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(240);
                 options.LoginPath = "/Identity/Account/Login";
-                // ReturnUrlParameter requires 
-                //using Microsoft.AspNetCore.Authentication.Cookies;
                 options.ReturnUrlParameter = CookieAuthenticationDefaults.ReturnUrlParameter;
                 options.SlidingExpiration = true;
             });
@@ -48,7 +44,6 @@ namespace BaseProject
             services.AddMvc();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, DbContext identityDbContext)
         {
             if (env.IsDevelopment())
